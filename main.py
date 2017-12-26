@@ -68,6 +68,61 @@ def mkdir(client, file_info):
             recall_msg(client, 0, '创建失败')
 
 
+# 获取移动设备的文件列表
+def get_media_files(fileInfo):
+    if len(os.listdir('/media/wjh/')) != 0:
+        media_name = os.listdir('/media/wjh/')[0]
+        media_path = os.path.join('/media/wjh/', media_name)
+
+        # 返回根目录文件列表
+        if fileInfo['file_type'] == 'root':
+            media_files = os.listdir(media_path)
+
+            result = []
+            for i in media_files:
+                if os.path.isdir(os.path.join(media_path, i)):
+                    result.append({
+                        'file_type': 'folder',
+                        'file_name': i,
+                        'file_path': ''
+                    })
+                else:
+                    file_basename = os.path.basename(i)
+                    file_type = os.path.splitext(file_basename)[1][1:]
+                    result.append({
+                        'file_type': file_type,
+                        'file_name': i,
+                        'file_path': '',
+                    })
+            recall_msg(client, 5, result)
+
+        # 根据目录信息获取目录下的文件列表
+        else:
+            file_path = os.path.join(
+                fileInfo['file_path'], fileInfo['file_name'])
+            print(file_path)
+
+            file_list = os.listdir(os.path.join(media_path, file_path))
+
+            result = []
+            for i in file_list:
+                if os.path.isdir(os.path.join(media_path, file_path, i)):
+                    file_type = 'folder'
+                else:
+                    file_basename = os.path.basename(i)
+                    file_type = os.path.split(file_basename)[1][1:]
+
+                result.append({
+                    'file_type': file_type,
+                    'file_name': i,
+                    'file_path': file_path,
+                })
+            recall_msg(client, 5, result)
+
+    else:
+        recall_msg(client, 1, '错误! 树莓派没有插入移动设备')
+
+
 # 连接 mqtt服务
 def on_connect(client, userdata, flags, rc):
     client.subscribe('disk')
@@ -99,6 +154,24 @@ def on_message(client, userdata, msg):
                 filename = os.path.basename(download_link)
 
                 recall_msg(client, 3, filename)
+
+            elif payload['op'] == 'check_media':
+                media_dir = os.listdir('/media/wjh/')
+                if len(media_dir) == 0:
+                    payload = {
+                        'has_media': 0,
+                    }
+                    recall_msg(client, 4, payload)
+                else:
+                    media_root_path = os.path.join('/media/wjh', media_dir[0])
+                    payload = {
+                        'has_media': 1,
+                        'media_root_path': media_root_path
+                    }
+                    recall_msg(client, 4, payload)
+
+            elif payload['op'] == 'get_media_files':
+                get_media_files(payload['data'])
 
         else:
             recall_msg(client, 0, '错误! 数据当中没有`op`键')
