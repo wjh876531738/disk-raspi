@@ -114,7 +114,6 @@ if __name__ == '__main__':
     BASE_URL = 'http://120.78.90.156/api/v1'
 
     file_url = 'http://sw.bos.baidu.com/sw-search-sp/software/7f64d1528e001/Sublime_Text_3.3143_Setup.exe'
-
     game_url = 'http://dlsw.baidu.com/sw-search-sp/soft/85/21019/HeroAcademy_1.0.0.1039.2313078873.exe'
     video_url = 'http://dl161.80s.im:920/1712/追龙/追龙.mp4'
 
