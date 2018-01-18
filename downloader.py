@@ -1,6 +1,7 @@
 import time
 import queue
 import requests
+import threading
 from threading import Thread
 
 
@@ -88,6 +89,7 @@ class DownloadPool(Thread):
                 download_task = self.__waiting_queue.get()
                 self.__running_task.append(download_task)
                 download_task.start()
+            time.sleep(1)
 
     # 添加任务
     def put(self, file_info):
@@ -107,6 +109,9 @@ class DownloadPool(Thread):
 
     def get_all_task_progress(self):
         return [task.get_download_progress() for task in self.__running_task]
+
+    def check_active_threading(self):
+        print(threading.active_count())
 
 
 # 程序主入口
