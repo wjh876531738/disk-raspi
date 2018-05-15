@@ -69,7 +69,7 @@ class DownloadTask(Thread):
         return self.__file_info
 
 
-# 下载任务线程池
+# 下载任务线程队列
 class DownloadPool(Thread):
 
     def __init__(self, running_max_size=3, waiting_max_size=10):
@@ -140,7 +140,7 @@ if __name__ == '__main__':
             'save_path': 'files/%d.exe' % i
         }
 
-        # 添加任务到下载池, 添加任务只需要提供下载的信息即可
+        # 添加任务到下载队列, 添加任务只需要提供下载的信息即可
         download_pool.put(file_info)
 
     for i in range(10):
